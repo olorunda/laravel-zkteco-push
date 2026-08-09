@@ -1,0 +1,180 @@
+{
+	"info": {
+		"_postman_id": "zkteco-push-middleware-v2",
+		"name": "ZKTeco Push SDK Middleware & External REST API Interpreter",
+		"description": "Postman Collection for testing ZKTeco ADMS hardware Push SDK requests and External REST API endpoints.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "External REST API (For HR/ERP Applications)",
+			"item": [
+				{
+					"name": "Get Connected Devices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/zkteco/devices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"zkteco",
+								"devices"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Attendance Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/zkteco/attendance?limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"zkteco",
+								"attendance"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add/Update User on Device",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"device_sn\": \"ZK-TEST-SN-9988\",\n    \"pin\": \"1005\",\n    \"name\": \"Sarah Jenkins\",\n    \"card_number\": \"88776655\",\n    \"password\": \"1234\",\n    \"privilege\": 0,\n    \"group_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/zkteco/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"zkteco",
+								"users"
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete User (with 2-Minute Delay)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"device_sn\": \"ZK-TEST-SN-9988\",\n    \"pin\": \"1005\",\n    \"delay_minutes\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/zkteco/users/1005",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"zkteco",
+								"users",
+								"1005"
+							]
+						}
+					}
+				},
+				{
+					"name": "Reboot Device",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "X-API-Key",
+								"value": "{{api_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"device_sn\": \"ZK-TEST-SN-9988\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/zkteco/commands/reboot",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"zkteco",
+								"commands",
+								"reboot"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "api_key",
+			"value": "zk_api_key_default_12345"
+		}
+	]
+}
