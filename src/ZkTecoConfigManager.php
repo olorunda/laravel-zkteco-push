@@ -24,22 +24,11 @@ class ZkTecoConfigManager
         $this->configFilePath = $configFilePath ?? __DIR__ . '/../config.json';
     }
 
+    /**
+     * Get all configuration settings.
+     */
     public function getConfig(): array
     {
-        if (function_exists('config') && config('zkteco-push')) {
-            return [
-                'table_prefix' => config('zkteco-push.table_prefix', 'zkteco_'),
-                'external_api_url' => config('zkteco-push.external_api_url', 'https://api.example.com/v1'),
-                'attendance_webhook_path' => config('zkteco-push.webhook.attendance_path', '/webhooks/attendance'),
-                'heartbeat_webhook_path' => config('zkteco-push.webhook.heartbeat_path', '/webhooks/device-status'),
-                'command_result_webhook_path' => config('zkteco-push.webhook.command_result_path', '/webhooks/command-result'),
-                'webhook_secret_token' => config('zkteco-push.webhook.secret_token', 'sk_live_zkteco_secret_9988'),
-                'webhook_enabled' => config('zkteco-push.webhook.enabled', true),
-                'middleware_api_key' => config('zkteco-push.api_key', 'zk_api_key_default_12345'),
-                'device_timeout_seconds' => 120,
-            ];
-        }
-
         if (file_exists($this->configFilePath)) {
             $saved = json_decode(file_get_contents($this->configFilePath), true) ?? [];
             return array_merge($this->defaultConfig, $saved);
@@ -48,16 +37,23 @@ class ZkTecoConfigManager
         return $this->defaultConfig;
     }
 
+    /**
+     * Get a specific configuration key.
+     */
     public function get(string $key, mixed $default = null): mixed
     {
         $config = $this->getConfig();
         return $config[$key] ?? $default;
     }
 
+    /**
+     * Update and persist configuration settings.
+     */
     public function updateConfig(array $newSettings): array
     {
         $current = $this->getConfig();
 
+        // Sanitize & sanitize URLs
         if (isset($newSettings['external_api_url'])) {
             $newSettings['external_api_url'] = rtrim(trim($newSettings['external_api_url']), '/');
         }
@@ -80,6 +76,9 @@ class ZkTecoConfigManager
         return $updated;
     }
 
+    /**
+     * Get full target Webhook URL for an event type.
+     */
     public function getWebhookUrl(string $eventType): ?string
     {
         $config = $this->getConfig();

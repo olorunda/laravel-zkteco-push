@@ -17,6 +17,9 @@ class ZkTecoAdminUi
         $this->storage = $storage;
     }
 
+    /**
+     * Render complete Admin Configuration & Live Dashboard HTML Page.
+     */
     public function renderPage(?string $message = null, ?string $messageType = 'success'): string
     {
         $config = $this->configManager->getConfig();
@@ -57,7 +60,11 @@ class ZkTecoAdminUi
             --danger: #ef4444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -83,7 +90,11 @@ class ZkTecoAdminUi
             z-index: 100;
         }
 
-        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
         .brand-logo {
             width: 38px;
@@ -98,8 +109,16 @@ class ZkTecoAdminUi
             box-shadow: 0 0 20px var(--accent-glow);
         }
 
-        .brand-title { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
-        .brand-subtitle { font-size: 12px; color: var(--text-muted); }
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
 
         .status-pill {
             display: inline-flex;
@@ -123,10 +142,19 @@ class ZkTecoAdminUi
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
 
-        .container { max-width: 1280px; margin: 32px auto; padding: 0 24px; }
+        .container {
+            max-width: 1280px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
 
+        /* Metrics Row */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -142,10 +170,26 @@ class ZkTecoAdminUi
             padding: 20px 24px;
         }
 
-        .metric-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
-        .metric-val { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
 
-        .tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px; }
+        .metric-val {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 24px;
+        }
 
         .tab-btn {
             background: none;
@@ -159,12 +203,24 @@ class ZkTecoAdminUi
             transition: all 0.2s ease;
         }
 
-        .tab-btn:hover { color: var(--text-main); }
-        .tab-btn.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .tab-btn.active {
+            color: var(--accent-primary);
+            border-bottom-color: var(--accent-primary);
+        }
 
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Card Section */
         .section-card {
             background: var(--card-bg);
             backdrop-filter: blur(16px);
@@ -174,12 +230,36 @@ class ZkTecoAdminUi
             margin-bottom: 24px;
         }
 
-        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .section-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
 
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; }
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Form Layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+        }
 
         .form-input {
             width: 100%;
@@ -191,6 +271,12 @@ class ZkTecoAdminUi
             font-size: 14px;
             font-family: inherit;
             outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .btn {
@@ -205,32 +291,125 @@ class ZkTecoAdminUi
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            transition: transform 0.1s, opacity 0.2s;
             text-decoration: none;
         }
 
-        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: var(--text-main); }
+        .btn:hover {
+            opacity: 0.9;
+        }
 
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-        th { background: rgba(15, 23, 42, 0.8); color: var(--text-muted); padding: 14px 18px; font-weight: 600; border-bottom: 1px solid var(--card-border); }
-        td { padding: 14px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .btn:active {
+            transform: scale(0.98);
+        }
 
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        /* Table Design */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--text-muted);
+            padding: 14px 18px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        td {
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .badge-online { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .badge-offline { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .badge-checkin { background: rgba(6, 182, 212, 0.2); color: #38bdf8; }
         .badge-checkout { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
-        .alert { padding: 14px 20px; border-radius: 10px; font-size: 14px; margin-bottom: 24px; }
+        .alert {
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
         .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; }
         .alert-danger { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; }
 
-        .toggle-switch { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .toggle-switch input { display: none; }
-        .toggle-slider { width: 44px; height: 24px; background: rgba(255, 255, 255, 0.2); border-radius: 12px; position: relative; transition: 0.3s; }
-        .toggle-slider::before { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: 0.3s; }
-        input:checked + .toggle-slider { background: var(--accent-primary); }
-        input:checked + .toggle-slider::before { transform: translateX(20px); }
+        .code-box {
+            background: #090d16;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            top: 3px;
+            left: 3px;
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--accent-primary);
+        }
+
+        input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body>
@@ -253,6 +432,7 @@ class ZkTecoAdminUi
 
         {$alertHtml}
 
+        <!-- Metrics Grid -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Connected ZKTeco Devices</div>
@@ -276,6 +456,7 @@ class ZkTecoAdminUi
             </div>
         </div>
 
+        <!-- Navigation Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('configTab')">⚙️ External API Config</button>
             <button class="tab-btn" onclick="showTab('devicesTab')">📱 Connected Devices ({$totalDevices})</button>
@@ -283,6 +464,7 @@ class ZkTecoAdminUi
             <button class="tab-btn" onclick="showTab('testerTab')">🧪 Interactive Hardware Command Tester</button>
         </div>
 
+        <!-- TAB 1: External API Configuration Form -->
         <div id="configTab" class="tab-content active">
             <div class="section-card">
                 <div class="section-title">External API & Webhook Forwarder Settings</div>
@@ -290,7 +472,7 @@ class ZkTecoAdminUi
                     Configure the External Backend API URL (e.g. HR / ERP / Payroll System). When a ZKTeco machine pushes attendance logs or heartbeats to this middleware, it translates them into JSON and forwards them to these endpoints.
                 </div>
 
-                <form method="POST" action="HTML_FORM_ACTION">
+                <form method="POST" action="/admin/config">
                     <input type="hidden" name="action" value="save_config">
 
                     <div class="form-group">
@@ -334,17 +516,19 @@ class ZkTecoAdminUi
                 </form>
             </div>
 
+            <!-- Test Webhook Section -->
             <div class="section-card">
                 <div class="section-title">🧪 Test External Webhook Dispatch</div>
                 <div class="section-desc">Send a sample attendance punch JSON payload to your configured External API URL to verify connectivity.</div>
                 
-                <form method="POST" action="HTML_FORM_ACTION">
+                <form method="POST" action="/admin/config">
                     <input type="hidden" name="action" value="test_webhook">
                     <button type="submit" class="btn btn-secondary">🚀 Send Test Webhook Payload</button>
                 </form>
             </div>
         </div>
 
+        <!-- TAB 2: Connected Devices -->
         <div id="devicesTab" class="tab-content">
             <div class="section-card">
                 <div class="section-title">Registered ZKTeco Biometric Devices</div>
@@ -369,6 +553,7 @@ class ZkTecoAdminUi
             </div>
         </div>
 
+        <!-- TAB 3: Attendance Log Stream -->
         <div id="attendanceTab" class="tab-content">
             <div class="section-card">
                 <div class="section-title">Parsed Real-Time Attendance Stream</div>
@@ -393,12 +578,13 @@ class ZkTecoAdminUi
             </div>
         </div>
 
+        <!-- TAB 4: Command Tester -->
         <div id="testerTab" class="tab-content">
             <div class="section-card">
                 <div class="section-title">Send Action Command to Device</div>
                 <div class="section-desc">Test translating external REST commands into ZKTeco ADMS push syntax (e.g. <code>DATA USERINFO PIN=101...</code> or <code>REBOOT</code>).</div>
                 
-                <form method="POST" action="HTML_FORM_ACTION">
+                <form method="POST" action="/admin/config">
                     <input type="hidden" name="action" value="send_test_command">
 
                     <div class="form-grid">
@@ -438,19 +624,22 @@ class ZkTecoAdminUi
 HTML;
     }
 
+    /**
+     * Render dynamic HTML rows for devices, logs, and status.
+     */
     public function renderPageWithData(?string $message = null, ?string $messageType = 'success'): string
     {
         $config = $this->configManager->getConfig();
         $devices = $this->storage->getAllDevices();
         $recentLogs = $this->storage->getAttendanceLogs([], 30, 0);
 
+        // Webhook status
         $webhookStatus = $config['webhook_enabled'] ? 'Enabled' : 'Disabled';
+
+        // Checkbox status
         $webhookChecked = $config['webhook_enabled'] ? 'checked' : '';
 
-        $formAction = str_contains($_SERVER['REQUEST_URI'] ?? '', 'zkteco/admin')
-            ? '/zkteco/admin/config'
-            : '/admin/config';
-
+        // Device Rows HTML
         $deviceRows = '';
         if (empty($devices)) {
             $deviceRows = "<tr><td colspan='5' style='text-align: center; color: var(--text-muted);'>No ZKTeco devices connected yet. Set device ADMS Server IP to this host.</td></tr>";
@@ -472,6 +661,7 @@ HTML;
             }
         }
 
+        // Attendance Rows HTML
         $attRows = '';
         if (empty($recentLogs)) {
             $attRows = "<tr><td colspan='5' style='text-align: center; color: var(--text-muted);'>No attendance logs recorded yet.</td></tr>";
@@ -489,7 +679,6 @@ HTML;
         }
 
         $html = $this->renderPage($message, $messageType);
-        $html = str_replace('HTML_FORM_ACTION', $formAction, $html);
         $html = str_replace('HTML_WEBHOOK_STATUS', $webhookStatus, $html);
         $html = str_replace('HTML_WEBHOOK_CHECKED', $webhookChecked, $html);
         $html = str_replace('HTML_DEVICE_ROWS', $deviceRows, $html);

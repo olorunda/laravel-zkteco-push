@@ -70,6 +70,9 @@ class ZkTecoPushMiddleware
 
     /**
      * Get a fluent device command manager for a target serial number.
+     *
+     * Example: ZkTecoPush::device('ZK-SN-001')->deleteUser('1003', delaySeconds: 120);
+     * Example: ZkTecoPush::device('ZK-SN-001')->addUser(['pin' => '1003', 'name' => 'Alice']);
      */
     public function device(string $serialNumber): ZkTecoDevice
     {
@@ -78,6 +81,9 @@ class ZkTecoPushMiddleware
 
     /**
      * Delete a user profile from hardware using PIN string or array payload.
+     *
+     * Example: ZkTecoPush::deleteUser('ZK-SN-001', ['pin' => '1003'], delaySeconds: 120);
+     * Example: ZkTecoPush::deleteUser('ZK-SN-001', '1003', delaySeconds: 120);
      */
     public function deleteUser(string $serialNumber, string|array $userPinOrArray, int $delaySeconds = 0): string
     {
@@ -86,6 +92,8 @@ class ZkTecoPushMiddleware
 
     /**
      * Add or update a user on hardware using array payload.
+     *
+     * Example: ZkTecoPush::addUser('ZK-SN-001', ['pin' => '1003', 'name' => 'Alice Smith']);
      */
     public function addUser(string $serialNumber, array $userData, int $delaySeconds = 0): string
     {
@@ -94,6 +102,8 @@ class ZkTecoPushMiddleware
 
     /**
      * Queue array-defined command or raw string command.
+     *
+     * Example: ZkTecoPush::queueCommand('ZK-SN-001', ['action' => 'delete_user', 'pin' => '1003'], delaySeconds: 120);
      */
     public function queueCommand(string $serialNumber, array|string $command, int $delaySeconds = 0): string
     {
@@ -183,11 +193,11 @@ class ZkTecoPushMiddleware
         }
 
         // 2. Admin UI Config Page (/admin, /config, or /)
-        if ($path === '/config' || $path === '/admin' || str_contains($path, '/zkteco/admin') || ($path === '/' && str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html'))) {
+        if ($path === '/config' || $path === '/admin' || ($path === '/' && str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html'))) {
             return $this->handleAdminUi($path, $method, $body);
         }
 
-        if (($path === '/admin/config' || str_contains($path, '/zkteco/admin/config')) && $method === 'POST') {
+        if ($path === '/admin/config' && $method === 'POST') {
             return $this->handleAdminFormPost();
         }
 

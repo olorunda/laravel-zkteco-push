@@ -22,11 +22,26 @@ class ZkTecoDevice
         $this->commandBuilder = $commandBuilder;
     }
 
+    /**
+     * Get target device serial number.
+     */
     public function getSerialNumber(): string
     {
         return $this->serialNumber;
     }
 
+    /**
+     * Queue a command using an associative array or raw string, with optional time delay in seconds.
+     *
+     * Example array usage:
+     * ZkTecoPush::device('ZK-SN-001')->queueCommand(['action' => 'delete_user', 'pin' => '1003'], delaySeconds: 120);
+     * ZkTecoPush::device('ZK-SN-001')->queueCommand(['action' => 'add_user', 'pin' => '1003', 'name' => 'Alice']);
+     * ZkTecoPush::device('ZK-SN-001')->queueCommand(['action' => 'reboot'], delaySeconds: 10);
+     *
+     * @param array|string $command Array payload definition or raw ADMS command string
+     * @param int $delaySeconds Time delay in seconds before command is dispatched to machine
+     * @return string Unique Command ID
+     */
     public function queueCommand(array|string $command, int $delaySeconds = 0): string
     {
         $cmdStr = is_array($command)
@@ -36,6 +51,17 @@ class ZkTecoDevice
         return $this->storage->queueCommand($this->serialNumber, $cmdStr, $delaySeconds);
     }
 
+    /**
+     * Delete a user profile from the hardware machine with optional time delay.
+     *
+     * Example:
+     * ZkTecoPush::device('ZK-SN-001')->deleteUser('1003', delaySeconds: 120);
+     * ZkTecoPush::device('ZK-SN-001')->deleteUser(['pin' => '1003'], delaySeconds: 120);
+     *
+     * @param string|array $userPinOrArray User PIN string or array containing ['pin' => '1003']
+     * @param int $delaySeconds Delay in seconds before deletion takes effect on device
+     * @return string Unique Command ID
+     */
     public function deleteUser(string|array $userPinOrArray, int $delaySeconds = 0): string
     {
         $pin = is_array($userPinOrArray)
@@ -49,6 +75,18 @@ class ZkTecoDevice
         return $cmdId;
     }
 
+    /**
+     * Add or update a user profile on the hardware machine with optional delay.
+     *
+     * Example:
+     * ZkTecoPush::device('ZK-SN-001')->addUser([
+     *     'pin' => '1003',
+     *     'name' => 'Alice Smith',
+     *     'card_number' => '987654321',
+     *     'password' => '4321',
+     *     'privilege' => 0
+     * ], delaySeconds: 0);
+     */
     public function addUser(array $userData, int $delaySeconds = 0): string
     {
         $pin = (string)($userData['pin'] ?? '');
@@ -67,6 +105,9 @@ class ZkTecoDevice
         return $cmdId;
     }
 
+    /**
+     * Reboot the hardware machine.
+     */
     public function reboot(int $delaySeconds = 0): string
     {
         return $this->storage->queueCommand(
@@ -76,6 +117,9 @@ class ZkTecoDevice
         );
     }
 
+    /**
+     * Sync system clock of the hardware machine with current server time.
+     */
     public function syncTime(?string $dateTime = null, int $delaySeconds = 0): string
     {
         return $this->storage->queueCommand(
@@ -85,6 +129,9 @@ class ZkTecoDevice
         );
     }
 
+    /**
+     * Clear all attendance log records stored on the machine.
+     */
     public function clearLogs(int $delaySeconds = 0): string
     {
         return $this->storage->queueCommand(
@@ -94,6 +141,9 @@ class ZkTecoDevice
         );
     }
 
+    /**
+     * Trigger door unlock relay for access control machines.
+     */
     public function unlockDoor(int $unlockSeconds = 5, int $delaySeconds = 0): string
     {
         return $this->storage->queueCommand(
@@ -103,6 +153,9 @@ class ZkTecoDevice
         );
     }
 
+    /**
+     * Get device metadata & status information.
+     */
     public function getDetails(): ?array
     {
         return $this->storage->getDevice($this->serialNumber);
