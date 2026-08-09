@@ -4,7 +4,7 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/zkteco/laravel-push-sdk.svg?style=flat-square)](https://packagist.org/packages/zkteco/laravel-push-sdk)
 [![License](https://img.shields.io/packagist/l/zkteco/laravel-push-sdk.svg?style=flat-square)](LICENSE.md)
 
-A clean, native **Laravel Package** (`zkteco/laravel-push-sdk`) that acts as an **interpreter bridge** between **ZKTeco Biometric Devices** (Fingerprint, Face, Palm, RFID Access Control) and any **External Application / API** (HR, ERP, Payroll System).
+A clean, native **Laravel Package** (`olorunda/laravel-zkteco-push`) that acts as an **interpreter bridge** between **ZKTeco Biometric Devices** (Fingerprint, Face, Palm, RFID Access Control) and any **External Application / API** (HR, ERP, Payroll System).
 
 ---
 
