@@ -15,6 +15,13 @@ class ZkTecoWebhookForwarder
         $this->configManager = $configManager;
     }
 
+    /**
+     * Dispatch translated JSON payload to the External API server.
+     *
+     * @param string $eventType 'attendance', 'heartbeat', 'command_result'
+     * @param array $payload Translated JSON data
+     * @return array ['success' => bool, 'http_code' => int, 'response' => string, 'url' => string]
+     */
     public function forward(string $eventType, array $payload): array
     {
         $webhookUrl = $this->configManager->getWebhookUrl($eventType);
@@ -37,6 +44,9 @@ class ZkTecoWebhookForwarder
         return $this->sendHttpRequest($webhookUrl, $jsonPayload, $secretToken);
     }
 
+    /**
+     * Send HTTP POST request to External API using cURL or fallback stream context.
+     */
     public function sendHttpRequest(string $url, string $jsonPayload, string $bearerToken): array
     {
         $headers = [
@@ -58,7 +68,7 @@ class ZkTecoWebhookForwarder
                 CURLOPT_POSTFIELDS => $jsonPayload,
                 CURLOPT_HTTPHEADER => $headers,
                 CURLOPT_TIMEOUT => 10,
-                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYPEER => false, // Set true in production with valid SSL
             ]);
 
             $response = curl_exec($ch);
@@ -74,6 +84,7 @@ class ZkTecoWebhookForwarder
             ];
         }
 
+        // Fallback using stream context if cURL extension is missing
         try {
             $context = stream_context_create([
                 'http' => [

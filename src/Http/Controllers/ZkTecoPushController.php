@@ -13,22 +13,22 @@ use ZkTeco\Push\Events\CommandExecuted;
 
 class ZkTecoPushController extends Controller
 {
-    private ZkTecoPushMiddleware $middleware;
+    private ZkTecoPushMiddleware $pushMiddleware;
 
-    public function __construct(ZkTecoPushMiddleware $middleware)
+    public function __construct(ZkTecoPushMiddleware $pushMiddleware)
     {
-        $this->middleware = $middleware;
+        $this->pushMiddleware = $pushMiddleware;
 
         // Dispatch Laravel Events automatically
-        $this->middleware->on('attendance', function (array $records, string $deviceSn) {
+        $this->pushMiddleware->on('attendance', function (array $records, string $deviceSn) {
             event(new AttendancePushed($records, $deviceSn));
         });
 
-        $this->middleware->on('heartbeat', function (string $deviceSn, array $meta) {
+        $this->pushMiddleware->on('heartbeat', function (string $deviceSn, array $meta) {
             event(new DeviceHeartbeat($deviceSn, $meta));
         });
 
-        $this->middleware->on('command_result', function (array $result, string $deviceSn) {
+        $this->pushMiddleware->on('command_result', function (array $result, string $deviceSn) {
             event(new CommandExecuted($result, $deviceSn));
         });
     }
@@ -38,7 +38,7 @@ class ZkTecoPushController extends Controller
      */
     public function handleDevice(Request $request): Response
     {
-        $res = $this->middleware->handleRequest(
+        $res = $this->pushMiddleware->handleRequest(
             $request->getRequestUri(),
             $request->getMethod(),
             $request->query->all(),
@@ -58,7 +58,7 @@ class ZkTecoPushController extends Controller
      */
     public function handleApi(Request $request): JsonResponse
     {
-        $res = $this->middleware->handleRequest(
+        $res = $this->pushMiddleware->handleRequest(
             $request->getRequestUri(),
             $request->getMethod(),
             $request->query->all(),
@@ -74,7 +74,7 @@ class ZkTecoPushController extends Controller
      */
     public function handleAdmin(Request $request): Response
     {
-        $res = $this->middleware->handleRequest(
+        $res = $this->pushMiddleware->handleRequest(
             $request->getRequestUri(),
             $request->getMethod(),
             $request->query->all(),

@@ -6,6 +6,9 @@ namespace ZkTeco\Push;
 
 class ZkTecoCommandBuilder
 {
+    /**
+     * Build command to create or update a user on the ZKTeco device.
+     */
     public function buildAddUser(
         string $pin,
         string $name,
@@ -32,42 +35,65 @@ class ZkTecoCommandBuilder
         return implode("\t", $parts);
     }
 
+    /**
+     * Build command to delete a user from device.
+     */
     public function buildDeleteUser(string $pin): string
     {
         return "DATA DELETE USERINFO PIN={$pin}";
     }
 
+    /**
+     * Build command to reboot the device.
+     */
     public function buildReboot(): string
     {
         return "REBOOT";
     }
 
+    /**
+     * Build command to clear all attendance logs on the device.
+     */
     public function buildClearLogs(): string
     {
         return "CLEAR LOG";
     }
 
+    /**
+     * Build command to sync system clock with server time.
+     */
     public function buildSyncTime(?string $dateTimeStr = null): string
     {
         $timeStr = $dateTimeStr ?? date('Y-m-d H:i:s');
         return "SET TIME {$timeStr}";
     }
 
+    /**
+     * Build command to query device hardware information.
+     */
     public function buildGetInfo(): string
     {
         return "INFO";
     }
 
+    /**
+     * Build command to trigger door unlock relay (for access control devices).
+     */
     public function buildUnlockDoor(int $delaySeconds = 5): string
     {
         return "AC_UNLOCK {$delaySeconds}";
     }
 
-    public function buildCheck(): string
-    {
-        return "CHECK";
-    }
-
+    /**
+     * Build command string from an associative array definition.
+     *
+     * Example inputs:
+     * ['action' => 'delete_user', 'pin' => '1003']
+     * ['action' => 'add_user', 'pin' => '1003', 'name' => 'Alice', 'card' => '987654']
+     * ['action' => 'reboot']
+     * ['action' => 'sync_time']
+     * ['action' => 'clear_logs']
+     */
     public function buildFromArray(array $commandData): string
     {
         $action = strtolower((string)($commandData['action'] ?? $commandData['cmd'] ?? ''));
@@ -112,6 +138,7 @@ class ZkTecoCommandBuilder
             return $this->buildCheck();
         }
 
+        // Custom string fallback if passed under 'raw' or 'command'
         if (isset($commandData['command']) || isset($commandData['raw'])) {
             return (string)($commandData['command'] ?? $commandData['raw']);
         }

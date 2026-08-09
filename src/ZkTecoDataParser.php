@@ -6,6 +6,9 @@ namespace ZkTeco\Push;
 
 class ZkTecoDataParser
 {
+    /**
+     * Map attendance status code to human readable label.
+     */
     public static array $statusMap = [
         0 => 'Check-In',
         1 => 'Check-Out',
@@ -16,6 +19,9 @@ class ZkTecoDataParser
         255 => 'Other',
     ];
 
+    /**
+     * Map verification type code to human readable label.
+     */
     public static array $verifyTypeMap = [
         0 => 'Password',
         1 => 'Fingerprint',
@@ -27,6 +33,15 @@ class ZkTecoDataParser
         25 => 'Palm',
     ];
 
+    /**
+     * Parse raw tab-separated attendance log body from ZKTeco device.
+     *
+     * Example input line:
+     * "101\t2026-08-09 08:30:15\t0\t1\t0\t0\t0"
+     *
+     * @param string $content
+     * @return array List of parsed log records
+     */
     public function parseAttendanceLogs(string $content): array
     {
         $records = [];
@@ -38,8 +53,10 @@ class ZkTecoDataParser
                 continue;
             }
 
+            // Tab-separated or space-separated fallback
             $parts = explode("\t", $line);
             if (count($parts) < 2) {
+                // Try splitting by space if tab is missing
                 $parts = preg_split('/\s+/', $line);
             }
 
@@ -47,6 +64,7 @@ class ZkTecoDataParser
                 $pin = trim($parts[0]);
                 $timestamp = trim($parts[1]);
 
+                // Ensure valid timestamp string
                 if (strtotime($timestamp) === false) {
                     continue;
                 }
@@ -71,6 +89,14 @@ class ZkTecoDataParser
         return $records;
     }
 
+    /**
+     * Parse command execution return body from device POST /iclock/devicecmd.
+     *
+     * Example: "ID=1001&Return=0&CMD=DATA" or "ID=1001\tReturn=0"
+     *
+     * @param string $content
+     * @return array ['command_id' => '1001', 'return_code' => 0, 'cmd_name' => 'DATA']
+     */
     public function parseDeviceCmdReturn(string $content): array
     {
         $result = [
@@ -104,6 +130,9 @@ class ZkTecoDataParser
         return $result;
     }
 
+    /**
+     * Parse user info table payload uploaded by device.
+     */
     public function parseUserInfo(string $content): array
     {
         $users = [];

@@ -31,12 +31,16 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
         $this->initializeSchema();
     }
 
+    /**
+     * Create database tables automatically if they do not exist.
+     */
     private function initializeSchema(): void
     {
         $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $autoIncrement = ($driver === 'sqlite') ? 'AUTOINCREMENT' : 'AUTO_INCREMENT';
         $textType = ($driver === 'sqlite') ? 'TEXT' : 'LONGTEXT';
 
+        // 1. Devices Table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS {$this->tDevices} (
                 serial_number VARCHAR(100) PRIMARY KEY,
@@ -48,6 +52,7 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
             )
         ");
 
+        // 2. Attendance Logs Table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS {$this->tLogs} (
                 id INTEGER PRIMARY KEY {$autoIncrement},
@@ -65,6 +70,7 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
             )
         ");
 
+        // 3. Device Commands Queue Table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS {$this->tCommands} (
                 command_id VARCHAR(100) PRIMARY KEY,
@@ -79,12 +85,14 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
             )
         ");
 
+        // Migration check for existing SQLite/MySQL databases created prior to execute_after column
         try {
             $this->pdo->exec("ALTER TABLE {$this->tCommands} ADD COLUMN execute_after DATETIME NULL");
         } catch (Exception $e) {
             // Column already exists
         }
 
+        // 4. User Profiles Table
         $this->pdo->exec("
             CREATE TABLE IF NOT EXISTS {$this->tUsers} (
                 pin VARCHAR(50) NOT NULL,
@@ -155,7 +163,7 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
         }
 
         $row['metadata'] = $row['metadata'] ? json_decode($row['metadata'], true) : [];
-        $row['is_online'] = (strtotime($row['last_seen_at']) >= (time() - 120));
+        $row['is_online'] = (strtotime($row['last_seen_at']) >= (time() - 120)); // Online if seen in last 2 mins
 
         return $row;
     }
@@ -211,7 +219,7 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
                     $insertedCount++;
                 }
             } catch (Exception $e) {
-                // Ignore duplicates
+                // Ignore duplicates or log
             }
         }
 
