@@ -67,13 +67,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Enable Admin Dashboard UI
+    | Enable Admin Dashboard UI & Middleware
     |--------------------------------------------------------------------------
     |
-    | Enable the web configuration dashboard at /zkteco/admin
+    | Enable the web configuration dashboard at /zkteco/admin.
+    | You can configure authentication or custom access middleware for the
+    | Admin UI dashboard route group (e.g. ['web', 'auth'], ['web', 'auth:sanctum'],
+    | or ['web', 'auth', 'can:access-zkteco']).
     |
     */
     'enable_admin_ui' => env('ZKTECO_ENABLE_ADMIN_UI', true),
-    'admin_route_prefix' => 'zkteco/admin',
+    'admin_route_prefix' => env('ZKTECO_ADMIN_ROUTE_PREFIX', 'zkteco/admin'),
+    'admin_middleware' => explode(',', env('ZKTECO_ADMIN_MIDDLEWARE', 'web')),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hardware Device & REST API Route Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Middleware applied to ZKTeco hardware push routes (/iclock/*)
+    | and REST API endpoints (/api/zkteco/*).
+    |
+    */
+    'device_middleware' => explode(',', env('ZKTECO_DEVICE_MIDDLEWARE', 'web')),
+    'api_middleware' => explode(',', env('ZKTECO_API_MIDDLEWARE', 'api')),
 
 ];

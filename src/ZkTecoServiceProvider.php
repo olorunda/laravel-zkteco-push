@@ -74,10 +74,14 @@ class ZkTecoServiceProvider extends ServiceProvider
         $apiPrefix = config('zkteco-push.api_route_prefix', 'api/zkteco');
         $adminPrefix = config('zkteco-push.admin_route_prefix', 'zkteco/admin');
 
+        $deviceMiddleware = $this->parseMiddleware(config('zkteco-push.device_middleware'), ['web']);
+        $apiMiddleware = $this->parseMiddleware(config('zkteco-push.api_middleware'), ['api']);
+        $adminMiddleware = $this->parseMiddleware(config('zkteco-push.admin_middleware'), ['web']);
+
         // 1. ZKTeco Device ADMS Protocol Routes (/iclock/cdata, /iclock/getrequest, etc.)
         Route::group([
             'prefix' => $devicePrefix,
-            'middleware' => ['web'],
+            'middleware' => $deviceMiddleware,
         ], function () {
             Route::any('{endpoint}', [ZkTecoPushController::class, 'handleDevice'])
                 ->where('endpoint', '.*');
@@ -86,7 +90,7 @@ class ZkTecoServiceProvider extends ServiceProvider
         // 2. External REST JSON API Routes (/api/zkteco/*)
         Route::group([
             'prefix' => $apiPrefix,
-            'middleware' => ['api'],
+            'middleware' => $apiMiddleware,
         ], function () {
             Route::any('{endpoint?}', [ZkTecoPushController::class, 'handleApi'])
                 ->where('endpoint', '.*');
@@ -96,11 +100,25 @@ class ZkTecoServiceProvider extends ServiceProvider
         if (config('zkteco-push.enable_admin_ui', true)) {
             Route::group([
                 'prefix' => $adminPrefix,
-                'middleware' => ['web'],
+                'middleware' => $adminMiddleware,
             ], function () {
                 Route::any('{endpoint?}', [ZkTecoPushController::class, 'handleAdmin'])
                     ->where('endpoint', '.*');
             });
         }
+    }
+
+    /**
+     * Parse middleware input (string or array) into normalized array.
+     */
+    protected function parseMiddleware(mixed $middleware, array $default = ['web']): array
+    {
+        if (is_string($middleware)) {
+            $middleware = array_map('trim', explode(',', $middleware));
+        }
+
+        $middleware = array_filter((array) ($middleware ?? $default));
+
+        return !empty($middleware) ? array_values($middleware) : $default;
     }
 }

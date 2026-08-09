@@ -59,10 +59,33 @@ ZKTECO_API_KEY=zk_api_key_live_998877
 
 # External Server Target (Where translated JSON webhooks are forwarded)
 ZKTECO_EXTERNAL_API_URL=https://api.yourcompany.com/v1
-ZKTECO_WEBHOOK_ENABLED=true
-ZKTECO_WEBHOOK_SECRET=sk_live_zkteco_secret_9988
-ZKTECO_ATTENDANCE_WEBHOOK_PATH=/webhooks/attendance
-ZKTECO_HEARTBEAT_WEBHOOK_PATH=/webhooks/device-status
+# Admin Dashboard UI & Middleware Security
+ZKTECO_ENABLE_ADMIN_UI=true
+ZKTECO_ADMIN_ROUTE_PREFIX=zkteco/admin
+ZKTECO_ADMIN_MIDDLEWARE=web,auth
+
+# Hardware & API Middleware
+ZKTECO_DEVICE_MIDDLEWARE=web
+ZKTECO_API_MIDDLEWARE=api
+```
+
+---
+
+## 🔒 Protecting the Admin UI with Auth Middleware
+
+You can secure the `/zkteco/admin` dashboard behind Laravel's standard `auth` middleware or custom authorization guards by updating `config/zkteco-push.php`:
+
+```php
+// In config/zkteco-push.php
+'admin_middleware' => ['web', 'auth'], // Require user authentication
+
+// Or with custom authorization / permission middleware:
+'admin_middleware' => ['web', 'auth', 'can:access-zkteco-admin'],
+```
+
+Or via environment variable:
+```ini
+ZKTECO_ADMIN_MIDDLEWARE="web,auth"
 ```
 
 ---
