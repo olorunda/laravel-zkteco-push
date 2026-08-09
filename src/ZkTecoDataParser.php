@@ -127,6 +127,8 @@ class ZkTecoDataParser
             }
         }
 
+        $result['is_success'] = ($result['return_code'] === 0);
+
         return $result;
     }
 
@@ -146,12 +148,19 @@ class ZkTecoDataParser
 
             parse_str(str_replace("\t", "&", $line), $data);
 
-            if (isset($data['PIN']) || isset($data['pin'])) {
-                $pin = $data['PIN'] ?? $data['pin'];
+            $pin = $data['PIN'] ?? $data['pin'] ?? null;
+            if (!$pin) {
+                $parts = explode("\t", $line);
+                if (!empty($parts[0]) && is_numeric(trim($parts[0]))) {
+                    $pin = trim($parts[0]);
+                }
+            }
+
+            if ($pin !== null && $pin !== '') {
                 $users[] = [
                     'pin' => (string)$pin,
                     'name' => $data['Name'] ?? $data['name'] ?? null,
-                    'password' => $data['Passwd'] ?? $data['password'] ?? null,
+                    'password' => $data['Passwd'] ?? $data['Password'] ?? $data['password'] ?? null,
                     'card_number' => $data['Card'] ?? $data['card'] ?? null,
                     'privilege' => isset($data['Pri']) ? (int)$data['Pri'] : 0,
                     'group_id' => isset($data['Grp']) ? (int)$data['Grp'] : 1,

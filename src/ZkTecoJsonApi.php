@@ -37,7 +37,11 @@ class ZkTecoJsonApi
             if ($this->configManager) {
                 $configuredKey = $this->configManager->get('middleware_api_key');
                 if (!empty($configuredKey)) {
-                    $providedKey = $_SERVER['HTTP_X_API_KEY'] ?? $_SERVER['HTTP_AUTHORIZATION'] ?? $queryParams['api_key'] ?? null;
+                    $providedKey = $_SERVER['HTTP_X_API_KEY']
+                        ?? $_SERVER['HTTP_AUTHORIZATION']
+                        ?? $queryParams['api_key']
+                        ?? (function_exists('request') ? (request()->header('X-API-Key') ?? request()->header('Authorization')) : null);
+
                     if ($providedKey) {
                         $providedKey = str_replace('Bearer ', '', $providedKey);
                     }
@@ -50,14 +54,14 @@ class ZkTecoJsonApi
 
             $input = json_decode($body, true) ?? [];
 
-            // 1. GET /api/devices - List devices
-            if (preg_match('#^/api/devices/?$#', $path) && $method === 'GET') {
+            // 1. GET /api/devices or /api/zkteco/devices - List devices
+            if (preg_match('#^/api/(?:zkteco/)?devices/?$#', $path) && $method === 'GET') {
                 $devices = $this->storage->getAllDevices();
                 return $this->jsonResponse(true, ['devices' => $devices]);
             }
 
-            // 2. GET /api/devices/{sn} - Single device
-            if (preg_match('#^/api/devices/([^/]+)$#', $path, $matches) && $method === 'GET') {
+            // 2. GET /api/devices/{sn} or /api/zkteco/devices/{sn} - Single device
+            if (preg_match('#^/api/(?:zkteco/)?devices/([^/]+)$#', $path, $matches) && $method === 'GET') {
                 $device = $this->storage->getDevice($matches[1]);
                 if (!$device) {
                     return $this->jsonResponse(false, ['error' => 'Device not found'], 404);
@@ -65,8 +69,8 @@ class ZkTecoJsonApi
                 return $this->jsonResponse(true, ['device' => $device]);
             }
 
-            // 3. GET /api/attendance - Query attendance logs
-            if (preg_match('#^/api/attendance/?$#', $path) && $method === 'GET') {
+            // 3. GET /api/attendance or /api/zkteco/attendance - Query attendance logs
+            if (preg_match('#^/api/(?:zkteco/)?attendance/?$#', $path) && $method === 'GET') {
                 $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 100;
                 $offset = isset($queryParams['offset']) ? (int)$queryParams['offset'] : 0;
 
@@ -77,8 +81,8 @@ class ZkTecoJsonApi
                 ]);
             }
 
-            // 4. POST /api/users - Create / update user on device
-            if (preg_match('#^/api/users/?$#', $path) && $method === 'POST') {
+            // 4. POST /api/users or /api/zkteco/users - Create / update user on device
+            if (preg_match('#^/api/(?:zkteco/)?users/?$#', $path) && $method === 'POST') {
                 $deviceSn = $input['device_sn'] ?? null;
                 $pin = $input['pin'] ?? null;
                 $name = $input['name'] ?? null;
@@ -107,8 +111,8 @@ class ZkTecoJsonApi
                 ]);
             }
 
-            // 5. DELETE /api/users/{pin} or DELETE /api/users - Remove user (with optional time delay)
-            if (preg_match('#^/api/users(?:/([^/]+))?$#', $path, $matches) && ($method === 'DELETE' || $method === 'POST')) {
+            // 5. DELETE /api/users/{pin} or DELETE /api/zkteco/users/{pin}
+            if (preg_match('#^/api/(?:zkteco/)?users(?:/([^/]+))?$#', $path, $matches) && ($method === 'DELETE' || $method === 'POST')) {
                 $pin = $matches[1] ?? $input['pin'] ?? null;
                 $deviceSn = $input['device_sn'] ?? $queryParams['device_sn'] ?? null;
 
@@ -136,7 +140,7 @@ class ZkTecoJsonApi
             }
 
             // 6. POST /api/commands/reboot
-            if (preg_match('#^/api/commands/reboot$#', $path) && $method === 'POST') {
+            if (preg_match('#^/api/(?:zkteco/)?commands/reboot$#', $path) && $method === 'POST') {
                 $deviceSn = $input['device_sn'] ?? null;
                 if (!$deviceSn) {
                     return $this->jsonResponse(false, ['error' => 'Missing device_sn'], 400);
@@ -147,7 +151,7 @@ class ZkTecoJsonApi
             }
 
             // 7. POST /api/commands/clear-logs
-            if (preg_match('#^/api/commands/clear-logs$#', $path) && $method === 'POST') {
+            if (preg_match('#^/api/(?:zkteco/)?commands/clear-logs$#', $path) && $method === 'POST') {
                 $deviceSn = $input['device_sn'] ?? null;
                 if (!$deviceSn) {
                     return $this->jsonResponse(false, ['error' => 'Missing device_sn'], 400);
@@ -158,7 +162,7 @@ class ZkTecoJsonApi
             }
 
             // 8. POST /api/commands/sync-time
-            if (preg_match('#^/api/commands/sync-time$#', $path) && $method === 'POST') {
+            if (preg_match('#^/api/(?:zkteco/)?commands/sync-time$#', $path) && $method === 'POST') {
                 $deviceSn = $input['device_sn'] ?? null;
                 if (!$deviceSn) {
                     return $this->jsonResponse(false, ['error' => 'Missing device_sn'], 400);
@@ -169,7 +173,7 @@ class ZkTecoJsonApi
             }
 
             // 9. GET /api/commands/status/{cmd_id}
-            if (preg_match('#^/api/commands/status/([^/]+)$#', $path, $matches) && $method === 'GET') {
+            if (preg_match('#^/api/(?:zkteco/)?commands/status/([^/]+)$#', $path, $matches) && $method === 'GET') {
                 $cmdStatus = $this->storage->getCommandStatus($matches[1]);
                 if (!$cmdStatus) {
                     return $this->jsonResponse(false, ['error' => 'Command ID not found'], 404);
@@ -179,7 +183,7 @@ class ZkTecoJsonApi
             }
 
             // 10. POST /api/commands/custom
-            if (preg_match('#^/api/commands/custom$#', $path) && $method === 'POST') {
+            if (preg_match('#^/api/(?:zkteco/)?commands/custom$#', $path) && $method === 'POST') {
                 $deviceSn = $input['device_sn'] ?? null;
                 $commandText = $input['command'] ?? null;
 

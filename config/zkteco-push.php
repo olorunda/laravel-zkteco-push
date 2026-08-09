@@ -78,7 +78,7 @@ return [
     */
     'enable_admin_ui' => env('ZKTECO_ENABLE_ADMIN_UI', true),
     'admin_route_prefix' => env('ZKTECO_ADMIN_ROUTE_PREFIX', 'zkteco/admin'),
-    'admin_middleware' => explode(',', env('ZKTECO_ADMIN_MIDDLEWARE', 'web')),
+    'admin_middleware' => ['web'],
 
     /*
     |--------------------------------------------------------------------------
@@ -89,7 +89,7 @@ return [
     | and REST API endpoints (/api/zkteco/*).
     |
     */
-    'device_middleware' => explode(',', env('ZKTECO_DEVICE_MIDDLEWARE', 'web')),
-    'api_middleware' => explode(',', env('ZKTECO_API_MIDDLEWARE', 'api')),
+    'device_middleware' => ['web'],
+    'api_middleware' => ['api'],
 
 ];

@@ -21,7 +21,11 @@ class ZkTecoConfigManager
 
     public function __construct(?string $configFilePath = null)
     {
-        $this->configFilePath = $configFilePath ?? __DIR__ . '/../config.json';
+        $path = $configFilePath ?? __DIR__ . '/../config.json';
+        if (str_ends_with($path, '.php')) {
+            $path = preg_replace('/\.php$/i', '.json', $path);
+        }
+        $this->configFilePath = $path;
     }
 
     /**

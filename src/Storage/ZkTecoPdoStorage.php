@@ -328,7 +328,7 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
         $now = date('Y-m-d H:i:s');
 
         $stmt = $this->pdo->prepare("
-            SELECT command_id AS id, command_text AS command
+            SELECT command_id AS id, command_text AS command, command_id, command_text
             FROM {$this->tCommands}
             WHERE device_sn = :sn AND status = 'PENDING' AND (execute_after IS NULL OR execute_after <= :now)
             ORDER BY queued_at ASC

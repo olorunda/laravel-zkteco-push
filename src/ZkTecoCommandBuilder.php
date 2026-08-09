@@ -10,13 +10,17 @@ class ZkTecoCommandBuilder
      * Build command to create or update a user on the ZKTeco device.
      */
     public function buildAddUser(
-        string $pin,
-        string $name,
+        string|array $pin,
+        ?string $name = null,
         ?string $cardNumber = null,
         ?string $password = null,
         int $privilege = 0,
         int $group = 1
     ): string {
+        if (is_array($pin)) {
+            return $this->buildFromArray(array_merge(['action' => 'add_user'], $pin));
+        }
+
         $parts = [
             "DATA USERINFO PIN={$pin}",
             "Name={$name}",
@@ -38,9 +42,37 @@ class ZkTecoCommandBuilder
     /**
      * Build command to delete a user from device.
      */
-    public function buildDeleteUser(string $pin): string
+    public function buildDeleteUser(string|array $pin): string
     {
+        if (is_array($pin)) {
+            $pin = (string)($pin['pin'] ?? $pin['delete_user'] ?? '');
+        }
+
         return "DATA DELETE USERINFO PIN={$pin}";
+    }
+
+    /**
+     * Build command to upload fingerprint template.
+     */
+    public function buildAddFingerprint(string $pin, int $fingerId, string $templateData, int $flag = 1): string
+    {
+        return "DATA FP PIN={$pin}\tFID={$fingerId}\tTMP={$templateData}\tFLAG={$flag}";
+    }
+
+    /**
+     * Build command to upload face template.
+     */
+    public function buildAddFace(string $pin, string $faceData): string
+    {
+        return "DATA FACE PIN={$pin}\tTMP={$faceData}";
+    }
+
+    /**
+     * Build command to upload palm template.
+     */
+    public function buildAddPalm(string $pin, string $palmData): string
+    {
+        return "DATA PALM PIN={$pin}\tTMP={$palmData}";
     }
 
     /**
@@ -57,6 +89,14 @@ class ZkTecoCommandBuilder
     public function buildClearLogs(): string
     {
         return "CLEAR LOG";
+    }
+
+    /**
+     * Build command to clear all user data and logs.
+     */
+    public function buildClearData(): string
+    {
+        return "CLEAR DATA";
     }
 
     /**

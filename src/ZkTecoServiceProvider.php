@@ -27,7 +27,8 @@ class ZkTecoServiceProvider extends ServiceProvider
 
         // Bind Config Manager
         $this->app->singleton(ZkTecoConfigManager::class, function ($app) {
-            return new ZkTecoConfigManager(config_path('zkteco-push.php'));
+            $jsonPath = function_exists('storage_path') ? storage_path('app/zkteco-config.json') : __DIR__ . '/../zkteco-config.json';
+            return new ZkTecoConfigManager($jsonPath);
         });
 
         // Bind Push Middleware
