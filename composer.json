@@ -1,5 +1,5 @@
 {
-    "name": "zkteco/laravel-push-sdk",
+    "name": "olorunda/laravel-zkteco-push",
     "description": "ZKTeco ADMS Push SDK Middleware & External REST API Interpreter Bridge for Laravel",
     "type": "library",
     "keywords": [
