@@ -473,6 +473,7 @@ class ZkTecoAdminUi
                 </div>
 
                 <form method="POST" action="">
+                    HTML_CSRF_FIELD
                     <input type="hidden" name="action" value="save_config">
 
                     <div class="form-group">
@@ -522,6 +523,7 @@ class ZkTecoAdminUi
                 <div class="section-desc">Send a sample attendance punch JSON payload to your configured External API URL to verify connectivity.</div>
                 
                 <form method="POST" action="">
+                    HTML_CSRF_FIELD
                     <input type="hidden" name="action" value="test_webhook">
                     <button type="submit" class="btn btn-secondary">🚀 Send Test Webhook Payload</button>
                 </form>
@@ -585,6 +587,7 @@ class ZkTecoAdminUi
                 <div class="section-desc">Test translating external REST commands into ZKTeco ADMS push syntax (e.g. <code>DATA USERINFO PIN=101...</code> or <code>REBOOT</code>).</div>
                 
                 <form method="POST" action="">
+                    HTML_CSRF_FIELD
                     <input type="hidden" name="action" value="send_test_command">
 
                     <div class="form-grid">
@@ -678,7 +681,15 @@ HTML;
             }
         }
 
+        $csrfField = '';
+        if (function_exists('csrf_field')) {
+            $csrfField = (string) csrf_field();
+        } elseif (function_exists('csrf_token')) {
+            $csrfField = '<input type="hidden" name="_token" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES) . '">';
+        }
+
         $html = $this->renderPage($message, $messageType);
+        $html = str_replace('HTML_CSRF_FIELD', $csrfField, $html);
         $html = str_replace('HTML_WEBHOOK_STATUS', $webhookStatus, $html);
         $html = str_replace('HTML_WEBHOOK_CHECKED', $webhookChecked, $html);
         $html = str_replace('HTML_DEVICE_ROWS', $deviceRows, $html);

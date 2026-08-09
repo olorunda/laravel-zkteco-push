@@ -201,7 +201,7 @@ class ZkTecoPushMiddleware
 
         if ($isAdminPath) {
             if ($method === 'POST') {
-                return $this->handleAdminFormPost();
+                return $this->handleAdminFormPost($body);
             }
             return $this->handleAdminUi($path, $method, $body);
         }
@@ -237,13 +237,24 @@ class ZkTecoPushMiddleware
     /**
      * Handle Config Form submission.
      */
-    private function handleAdminFormPost(): array
+    private function handleAdminFormPost(?string $body = null): array
     {
         $adminUi = new ZkTecoAdminUi($this->configManager, $this->storage);
         $postData = $_POST;
-        if (empty($postData)) {
-            $body = file_get_contents('php://input');
+
+        if (empty($postData) && function_exists('request')) {
+            $postData = request()->all();
+        }
+
+        if (empty($postData) && !empty($body)) {
             parse_str($body, $postData);
+        }
+
+        if (empty($postData)) {
+            $rawInput = file_get_contents('php://input');
+            if (!empty($rawInput)) {
+                parse_str($rawInput, $postData);
+            }
         }
 
         $action = $postData['action'] ?? 'save_config';
