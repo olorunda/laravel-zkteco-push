@@ -192,13 +192,18 @@ class ZkTecoPushMiddleware
             return $this->handleFData($method, $queryParams, $body);
         }
 
-        // 2. Admin UI Config Page (/admin, /config, or /)
-        if ($path === '/config' || $path === '/admin' || ($path === '/' && str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html'))) {
-            return $this->handleAdminUi($path, $method, $body);
-        }
+        // 2. Admin UI Config Page (/admin, /config, /zkteco/admin, or any path containing /admin)
+        $isAdminPath = str_contains($path, '/admin')
+            || str_contains($path, '/config')
+            || $path === '/admin'
+            || $path === '/config'
+            || ($path === '/' && str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'text/html'));
 
-        if ($path === '/admin/config' && $method === 'POST') {
-            return $this->handleAdminFormPost();
+        if ($isAdminPath) {
+            if ($method === 'POST') {
+                return $this->handleAdminFormPost();
+            }
+            return $this->handleAdminUi($path, $method, $body);
         }
 
         // 3. Easy REST JSON API Routes for External API Server
@@ -235,18 +240,24 @@ class ZkTecoPushMiddleware
     private function handleAdminFormPost(): array
     {
         $adminUi = new ZkTecoAdminUi($this->configManager, $this->storage);
-        $action = $_POST['action'] ?? 'save_config';
+        $postData = $_POST;
+        if (empty($postData)) {
+            $body = file_get_contents('php://input');
+            parse_str($body, $postData);
+        }
+
+        $action = $postData['action'] ?? 'save_config';
         $message = null;
         $messageType = 'success';
 
         if ($action === 'save_config') {
             $this->configManager->updateConfig([
-                'external_api_url' => $_POST['external_api_url'] ?? '',
-                'attendance_webhook_path' => $_POST['attendance_webhook_path'] ?? '',
-                'heartbeat_webhook_path' => $_POST['heartbeat_webhook_path'] ?? '',
-                'webhook_secret_token' => $_POST['webhook_secret_token'] ?? '',
-                'webhook_enabled' => isset($_POST['webhook_enabled']),
-                'middleware_api_key' => $_POST['middleware_api_key'] ?? '',
+                'external_api_url' => $postData['external_api_url'] ?? '',
+                'attendance_webhook_path' => $postData['attendance_webhook_path'] ?? '',
+                'heartbeat_webhook_path' => $postData['heartbeat_webhook_path'] ?? '',
+                'webhook_secret_token' => $postData['webhook_secret_token'] ?? '',
+                'webhook_enabled' => isset($postData['webhook_enabled']),
+                'middleware_api_key' => $postData['middleware_api_key'] ?? '',
             ]);
             $message = 'Configuration updated successfully! Middleware is ready to bridge device events to External API.';
         } elseif ($action === 'test_webhook') {
@@ -274,8 +285,8 @@ class ZkTecoPushMiddleware
                 $message = "Failed to dispatch test webhook: {$errDetail}";
             }
         } elseif ($action === 'send_test_command') {
-            $sn = $_POST['device_sn'] ?? '';
-            $cmdType = $_POST['command_type'] ?? '';
+            $sn = $postData['device_sn'] ?? '';
+            $cmdType = $postData['command_type'] ?? '';
 
             if (!empty($sn)) {
                 $cmdStr = match ($cmdType) {

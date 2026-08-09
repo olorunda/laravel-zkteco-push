@@ -472,7 +472,7 @@ class ZkTecoAdminUi
                     Configure the External Backend API URL (e.g. HR / ERP / Payroll System). When a ZKTeco machine pushes attendance logs or heartbeats to this middleware, it translates them into JSON and forwards them to these endpoints.
                 </div>
 
-                <form method="POST" action="/admin/config">
+                <form method="POST" action="">
                     <input type="hidden" name="action" value="save_config">
 
                     <div class="form-group">
@@ -521,7 +521,7 @@ class ZkTecoAdminUi
                 <div class="section-title">🧪 Test External Webhook Dispatch</div>
                 <div class="section-desc">Send a sample attendance punch JSON payload to your configured External API URL to verify connectivity.</div>
                 
-                <form method="POST" action="/admin/config">
+                <form method="POST" action="">
                     <input type="hidden" name="action" value="test_webhook">
                     <button type="submit" class="btn btn-secondary">🚀 Send Test Webhook Payload</button>
                 </form>
@@ -584,7 +584,7 @@ class ZkTecoAdminUi
                 <div class="section-title">Send Action Command to Device</div>
                 <div class="section-desc">Test translating external REST commands into ZKTeco ADMS push syntax (e.g. <code>DATA USERINFO PIN=101...</code> or <code>REBOOT</code>).</div>
                 
-                <form method="POST" action="/admin/config">
+                <form method="POST" action="">
                     <input type="hidden" name="action" value="send_test_command">
 
                     <div class="form-grid">
