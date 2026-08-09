@@ -24,7 +24,7 @@ A clean, native **Laravel Package** (`olorunda/laravel-zkteco-push`) that acts a
 ### Step 1: Install Package via Composer
 
 ```bash
-composer require zkteco/laravel-push-sdk
+composer require olorunda/laravel-zkteco-push
 ```
 
 Or for local development in your main Laravel `composer.json`:
@@ -437,3 +437,20 @@ class BiometricEmployeeManagementController extends Controller
     }
 }
 ```
+
+---
+
+## 🧪 Running Tests
+
+Run the PHPUnit test suite using Composer:
+
+```bash
+composer test
+```
+
+Or run PHPUnit directly:
+
+```bash
+vendor/bin/phpunit
+```
+
