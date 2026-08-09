@@ -95,17 +95,21 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
         ];
 
         foreach ($deviceColumns as $colName => $colDef) {
-            try {
-                $this->pdo->exec("ALTER TABLE {$this->tDevices} ADD COLUMN {$colName} {$colDef}");
-            } catch (Throwable $e) {
-                // Column already exists or alter not required
+            if (!$this->hasColumn($this->tDevices, $colName)) {
+                try {
+                    $this->pdo->exec("ALTER TABLE {$this->tDevices} ADD COLUMN {$colName} {$colDef}");
+                } catch (Throwable $e) {
+                    // Column already exists or alter not required
+                }
             }
         }
 
-        try {
-            $this->pdo->exec("ALTER TABLE {$this->tCommands} ADD COLUMN execute_after DATETIME NULL");
-        } catch (Throwable $e) {
-            // Column already exists
+        if (!$this->hasColumn($this->tCommands, 'execute_after')) {
+            try {
+                $this->pdo->exec("ALTER TABLE {$this->tCommands} ADD COLUMN execute_after DATETIME NULL");
+            } catch (Throwable $e) {
+                // Column already exists
+            }
         }
 
         // 4. User Profiles Table
@@ -439,6 +443,33 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
         } else {
             $stmt = $this->pdo->prepare("DELETE FROM {$this->tUsers} WHERE pin = :pin");
             $stmt->execute([':pin' => $pin]);
+        }
+    }
+
+    private function hasColumn(string $tableName, string $columnName): bool
+    {
+        try {
+            $driver = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if ($driver === 'sqlite') {
+                $stmt = $this->pdo->query("PRAGMA table_info({$tableName})");
+                $columns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($columns as $col) {
+                    if (isset($col['name']) && strcasecmp($col['name'], $columnName) === 0) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                $stmt = $this->pdo->prepare("
+                    SELECT COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = :tbl AND COLUMN_NAME = :col
+                ");
+                $stmt->execute([':tbl' => $tableName, ':col' => $columnName]);
+                return (bool) $stmt->fetchColumn();
+            }
+        } catch (Throwable $e) {
+            return false;
         }
     }
 }
