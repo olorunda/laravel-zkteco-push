@@ -25,8 +25,26 @@ return new class extends Migration
                 $table->string('ip_address', 45)->nullable();
                 $table->string('push_version', 50)->nullable();
                 $table->string('firmware', 100)->nullable();
-                $table->dateTime('last_seen_at');
+                $table->dateTime('last_seen_at')->nullable();
                 $table->text('metadata')->nullable();
+            });
+        } else {
+            Schema::table($tDevices, function (Blueprint $table) use ($tDevices) {
+                if (!Schema::hasColumn($tDevices, 'last_seen_at')) {
+                    $table->dateTime('last_seen_at')->nullable();
+                }
+                if (!Schema::hasColumn($tDevices, 'ip_address')) {
+                    $table->string('ip_address', 45)->nullable();
+                }
+                if (!Schema::hasColumn($tDevices, 'push_version')) {
+                    $table->string('push_version', 50)->nullable();
+                }
+                if (!Schema::hasColumn($tDevices, 'firmware')) {
+                    $table->string('firmware', 100)->nullable();
+                }
+                if (!Schema::hasColumn($tDevices, 'metadata')) {
+                    $table->text('metadata')->nullable();
+                }
             });
         }
 

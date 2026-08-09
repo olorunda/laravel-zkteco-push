@@ -85,10 +85,26 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
             )
         ");
 
-        // Migration check for existing SQLite/MySQL databases created prior to execute_after column
+        // Migration checks for existing databases created prior to schema updates
+        $deviceColumns = [
+            'last_seen_at' => 'DATETIME NULL',
+            'ip_address' => 'VARCHAR(45) NULL',
+            'push_version' => 'VARCHAR(50) NULL',
+            'firmware' => 'VARCHAR(100) NULL',
+            'metadata' => "{$textType} NULL"
+        ];
+
+        foreach ($deviceColumns as $colName => $colDef) {
+            try {
+                $this->pdo->exec("ALTER TABLE {$this->tDevices} ADD COLUMN {$colName} {$colDef}");
+            } catch (Throwable $e) {
+                // Column already exists or alter not required
+            }
+        }
+
         try {
             $this->pdo->exec("ALTER TABLE {$this->tCommands} ADD COLUMN execute_after DATETIME NULL");
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // Column already exists
         }
 
@@ -162,20 +178,33 @@ class ZkTecoPdoStorage implements ZkTecoStorageInterface
             return null;
         }
 
-        $row['metadata'] = $row['metadata'] ? json_decode($row['metadata'], true) : [];
-        $row['is_online'] = (strtotime($row['last_seen_at']) >= (time() - 120)); // Online if seen in last 2 mins
+        $row['metadata'] = isset($row['metadata']) && $row['metadata'] ? json_decode($row['metadata'], true) : [];
+        $lastSeen = $row['last_seen_at'] ?? $row['updated_at'] ?? $row['created_at'] ?? date('Y-m-d H:i:s');
+        $row['last_seen_at'] = $lastSeen;
+        $row['is_online'] = (strtotime($lastSeen) >= (time() - 120));
 
         return $row;
     }
 
     public function getAllDevices(): array
     {
-        $stmt = $this->pdo->query("SELECT * FROM {$this->tDevices} ORDER BY last_seen_at DESC");
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->pdo->query("SELECT * FROM {$this->tDevices} ORDER BY last_seen_at DESC");
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            try {
+                $stmt = $this->pdo->query("SELECT * FROM {$this->tDevices}");
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Throwable $e2) {
+                return [];
+            }
+        }
 
         foreach ($rows as &$row) {
-            $row['metadata'] = $row['metadata'] ? json_decode($row['metadata'], true) : [];
-            $row['is_online'] = (strtotime($row['last_seen_at']) >= (time() - 120));
+            $row['metadata'] = isset($row['metadata']) && $row['metadata'] ? json_decode($row['metadata'], true) : [];
+            $lastSeen = $row['last_seen_at'] ?? $row['updated_at'] ?? $row['created_at'] ?? date('Y-m-d H:i:s');
+            $row['last_seen_at'] = $lastSeen;
+            $row['is_online'] = (strtotime($lastSeen) >= (time() - 120));
         }
 
         return $rows;
