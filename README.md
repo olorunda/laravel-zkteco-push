@@ -1,8 +1,8 @@
 # ZKTeco ADMS Push SDK Laravel Package & REST API Interpreter Bridge
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/zkteco/laravel-push-sdk.svg?style=flat-square)](https://packagist.org/packages/zkteco/laravel-push-sdk)
-[![Total Downloads](https://img.shields.io/packagist/dt/zkteco/laravel-push-sdk.svg?style=flat-square)](https://packagist.org/packages/zkteco/laravel-push-sdk)
-[![License](https://img.shields.io/packagist/l/zkteco/laravel-push-sdk.svg?style=flat-square)](LICENSE.md)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/zkteco/laravel-push-sdk.svg?style=flat-square)](https://packagist.org/packages/olorunda/laravel-zkteco-push)
+[![Total Downloads](https://img.shields.io/packagist/dt/zkteco/laravel-push-sdk.svg?style=flat-square)](https://packagist.org/packages/olorunda/laravel-zkteco-push)
+[![License](https://img.shields.io/packagist/l/olorunda/laravel-zkteco-push.svg?style=flat-square)](LICENSE.md)
 
 A clean, native **Laravel Package** (`olorunda/laravel-zkteco-push`) that acts as an **interpreter bridge** between **ZKTeco Biometric Devices** (Fingerprint, Face, Palm, RFID Access Control) and any **External Application / API** (HR, ERP, Payroll System).
 
